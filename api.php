@@ -4,13 +4,18 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
+// បញ្ឈប់ការដំណើរការភ្លាម ប្រសិនបើជា OPTIONS request (CORS Preflight)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
+
 // ១. ភ្ជាប់ទៅកាន់ Database
 
 // ព័ត៌មានភ្ជាប់ទៅកាន់ Supabase (ផ្អែកលើ Project URL: ovkokplnskgljyvmeuib)
-$host     = getenv('DB_HOST') ?: 'db.ovkokplnskgljyvmeuib.supabase.co';
+$host     = getenv('DB_HOST') ?: 'aws-0-ap-southeast-1.pooler.supabase.com'; // ប្រើ Pooler host បើមាន
 $db_name  = getenv('DB_NAME') ?: 'postgres';
-$username = getenv('DB_USER');     // ជាទូទៅគឺ postgres
-$password = getenv('DB_PASSWORD'); // លេខសម្ងាត់ Database របស់អ្នក
+$username = getenv('DB_USER') ?: 'postgres';
+$password = getenv('DB_PASSWORD');
 $port     = getenv('DB_PORT') ?: '5432';
 
 try {
