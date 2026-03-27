@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>គ្រប់គ្រងអាជីវកម្ម</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-shop"></i></div>
+      <div class="logo-text">
+        <span class="logo-title">NyKa-Shop</span>
+        <span class="logo-sub">Business Pro</span>
+      </div>
+    </div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">ម៉ឺនុយចម្បង</div>
+    <a href="#" class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-text">ផ្ទាំងគ្រប់គ្រង</span>
+    </a>
+    <a href="#" class="nav-item" data-page="transactions">
+      <span class="nav-icon">💰</span>
+      <span class="nav-text">ចំណូល & ចំណាយ</span>
+    </a>
+    <a href="#" class="nav-item" data-page="inventory">
+      <span class="nav-icon">📦</span>
+      <span class="nav-text">ស្តុកទំនិញ</span>
+    </a>
+    <a href="#" class="nav-item" data-page="customers">
+      <span class="nav-icon">👤</span>
+      <span class="nav-text">អតិថិជន</span>
+    </a>
+    <a href="#" class="nav-item" data-page="orders">
+      <span class="nav-icon">🧾</span>
+      <span class="nav-text">ការលក់</span>
+    </a>
+    <a href="#" class="nav-item" data-page="debts">
+      <span class="nav-icon">💳</span>
+      <span class="nav-text">បំណុល / ឥណទាន</span>
+    </a>
+    <div class="nav-section-label">របាយការណ៍</div>
+    <a href="#" class="nav-item" data-page="reports">
+      <span class="nav-icon">📈</span>
+      <span class="nav-text">របាយការណ៍</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="dark-toggle" id="darkToggle">
+      <span id="darkIcon">🌙</span>
+      <span id="darkText">ងងឹត</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="main-wrapper" id="mainWrapper">
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-icon-btn" id="mobileMenuBtn">☰</button>
+      <h1 class="page-title" id="pageTitle">ផ្ទាំងគ្រប់គ្រង</h1>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="ស្វែងរក..." id="globalSearch">
+      </div>
+      <button class="btn-export" onclick="exportData()">📤 នាំចេញ</button>
+      <div class="user-badge">
+        <div class="user-avatar"><i class="fa-solid fa-shop"></i></div>
+        <span>NyKa-Shop</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pages -->
+  <main class="content-area">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card income">
+          <div class="stat-icon">💵</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណូលសរុប</div>
+            <div class="stat-value" id="totalIncome">$0</div>
+            <div class="stat-change positive">+0%</div>
+          </div>
+        </div>
+        <div class="stat-card expense">
+          <div class="stat-icon">💸</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណាយសរុប</div>
+            <div class="stat-value" id="totalExpense">$0</div>
+            <div class="stat-change negative">+0%</div>
+          </div>
+        </div>
+        <div class="stat-card profit">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណេញសុទ្ធ</div>
+            <div class="stat-value" id="totalProfit">$0</div>
+            <div class="stat-change positive">+0%</div>
+          </div>
+        </div>
+        <div class="stat-card customers">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <div class="stat-label">អតិថិជន</div>
+            <div class="stat-value" id="totalCustomers">0</div>
+            <div class="stat-change positive">នាក់</div>
+          </div>
+        </div>
+        <div class="stat-card orders">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-info">
+            <div class="stat-label">ការបញ្ជាទិញ</div>
+            <div class="stat-value" id="totalOrders">0</div>
+            <div class="stat-change positive">លក្ខខណ្ឌ</div>
+          </div>
+        </div>
+        <div class="stat-card inventory">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <div class="stat-label">ផលិតផល</div>
+            <div class="stat-value" id="totalProducts">0</div>
+            <div class="stat-change">ប្រភេទ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>ចំណូល vs ចំណាយ</h3>
+            <select id="chartPeriod" onchange="updateDashboardCharts()">
+              <option value="7">7 ថ្ងៃ</option>
+              <option value="30" selected>30 ថ្ងៃ</option>
+              <option value="90">90 ថ្ងៃ</option>
+            </select>
+          </div>
+          <canvas id="lineChart" height="280"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>ការចំណាយតាមប្រភេទ</h3>
+          </div>
+          <canvas id="pieChart" height="280"></canvas>
+        </div>
+      </div>
+
+      <div class="recent-section">
+        <div class="recent-card">
+          <h3>ប្រតិបត្តិការថ្មីៗ</h3>
+          <div id="recentTransactions"></div>
+        </div>
+        <div class="recent-card">
+          <h3>ការបញ្ជាទិញថ្មីៗ</h3>
+          <div id="recentOrders"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS PAGE -->
+    <div class="page" id="page-transactions">
+      <div class="page-toolbar">
+        <button class="btn-primary" onclick="openModal('transactionModal')">+ បន្ថែមប្រតិបត្តិការ</button>
+        <div class="filter-group">
+          <select id="txFilter" onchange="renderTransactions()">
+            <option value="all">ទាំងអស់</option>
+            <option value="income">ចំណូល</option>
+            <option value="expense">ចំណាយ</option>
+          </select>
+          <input type="text" placeholder="ស្វែងរក..." id="txSearch" oninput="renderTransactions()">
+        </div>
+      </div>
+
+      <div class="data-table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ចំណងជើង</th>
+              <th>ប្រភេទ</th>
+              <th>ប្រភេទរង</th>
+              <th>ចំនួន</th>
+              <th>កាលបរិច្ឆេទ</th>
+              <th>សកម្មភាព</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INVENTORY PAGE -->
+    <div class="page" id="page-inventory">
+      <div class="page-toolbar">
+        <button class="btn-primary" onclick="openModal('inventoryModal')">+ បន្ថែមផលិតផល</button>
+        <input type="text" placeholder="ស្វែងរក..." id="invSearch" oninput="renderInventory()">
+      </div>
+      <div class="data-table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ឈ្មោះផលិតផល</th>
+              <th>តម្លៃទិញ</th>
+              <th>តម្លៃលក់</th>
+              <th>ចំនួន</th>
+              <th>ចំណេញ/ឯកតា</th>
+              <th>ស្ថានភាព</th>
+              <th>សកម្មភាព</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="page" id="page-customers">
+      <div class="page-toolbar">
+        <button class="btn-primary" onclick="prepareCustomerModal()">+ បន្ថែមអតិថិជន</button>
+        <input type="text" placeholder="ស្វែងរក..." id="custSearch" oninput="renderCustomers()">
+      </div>
+      <div class="customers-grid" id="customersGrid"></div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div class="page" id="page-orders">
+      <div class="page-toolbar">
+        <button class="btn-primary" onclick="openModal('orderModal')">+ បង្កើតការបញ្ជាទិញ</button>
+        <input type="text" placeholder="ស្វែងរក..." id="orderSearch" oninput="renderOrders()">
+      </div>
+      <div class="data-table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>អតិថិជន</th>
+              <th>ផលិតផល</th>
+              <th>សរុប</th>
+              <th>ចំណេញ</th>
+              <th>កាលបរិច្ឆេទ</th>
+              <th>សកម្មភាព</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEBTS PAGE -->
+    <div class="page" id="page-debts">
+      <div class="page-toolbar">
+        <button class="btn-primary" onclick="openModal('debtModal')">+ បន្ថែមបំណុល</button>
+        <select id="debtFilter" onchange="renderDebts()">
+          <option value="all">ទាំងអស់</option>
+          <option value="receivable">អតិថិជនជំពាក់</option>
+          <option value="payable">ខ្ញុំជំពាក់</option>
+        </select>
+      </div>
+      <div class="data-table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ឈ្មោះ</th>
+              <th>ប្រភេទ</th>
+              <th>ចំនួន</th>
+              <th>ពិពណ៌នា</th>
+              <th>កាលបរិច្ឆេទ</th>
+              <th>ស្ថានភាព</th>
+              <th>សកម្មភាព</th>
+            </tr>
+          </thead>
+          <tbody id="debtsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+      <div class="page-toolbar">
+        <select id="reportPeriod" onchange="renderReports()">
+          <option value="daily">ប្រចាំថ្ងៃ</option>
+          <option value="monthly" selected>ប្រចាំខែ</option>
+        </select>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card income">
+          <div class="stat-icon">💵</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណូល</div>
+            <div class="stat-value" id="rIncome">$0</div>
+          </div>
+        </div>
+        <div class="stat-card expense">
+          <div class="stat-icon">💸</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណាយ</div>
+            <div class="stat-value" id="rExpense">$0</div>
+          </div>
+        </div>
+        <div class="stat-card profit">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <div class="stat-label">ចំណេញ</div>
+            <div class="stat-value" id="rProfit">$0</div>
+          </div>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>ចំណូល vs ចំណាយ (ប្រចាំខែ)</h3>
+          <canvas id="reportLineChart" height="260"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>ការចំណាយតាមប្រភេទ</h3>
+          <canvas id="reportPieChart" height="260"></canvas>
+        </div>
+      </div>
+      <div class="reports-bottom">
+        <div class="report-list-card">
+          <h3>ផលិតផលលក់ដាច់ជាងគេ</h3>
+          <div id="topProducts"></div>
+        </div>
+        <div class="report-list-card">
+          <h3>អតិថិជនល្អបំផុត</h3>
+          <div id="topCustomers"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- =================== MODALS =================== -->
+
+<!-- Transaction Modal -->
+<div class="modal-overlay" id="transactionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="txModalTitle">បន្ថែមប្រតិបត្តិការ</h2>
+      <button class="modal-close" onclick="closeModal('transactionModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="txId">
+      <div class="form-group">
+        <label>ចំណងជើង</label>
+        <input type="text" id="txTitle" placeholder="ចំណងជើងប្រតិបត្តិការ">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ចំនួន ($)</label>
+          <input type="number" id="txAmount" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>ប្រភេទ</label>
+          <select id="txType">
+            <option value="income">ចំណូល</option>
+            <option value="expense">ចំណាយ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ប្រភេទរង</label>
+          <select id="txCategory">
+            <option value="ការលក់">ការលក់</option>
+            <option value="សេវាកម្ម">កម្ម Online</option>
+            <!-- <option value="ភ្លើង/ទឹក">ភ្លើង/ទឹក</option> -->
+            <option value="ម្ហូបអាហារ">ម្ហូបអាហារ</option>
+            <option value="ដឹកជញ្ជូន">ទិញឡេ</option>
+            <!-- <option value="ប្រាក់ខែ">ប្រាក់ខែ</option> -->
+            <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>កាលបរិច្ឆេទ</label>
+          <input type="date" id="txDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>កំណត់ចំណាំ</label>
+        <textarea id="txNote" placeholder="កំណត់ចំណាំ (ស្រេចចិត្ត)" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('transactionModal')">បោះបង់</button>
+      <button class="btn-primary" onclick="saveTransaction()">រក្សាទុក</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory Modal -->
+<div class="modal-overlay" id="inventoryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="invModalTitle">បន្ថែមផលិតផល</h2>
+      <button class="modal-close" onclick="closeModal('inventoryModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="invId">
+      <div class="form-group">
+        <label>ឈ្មោះផលិតផល</label>
+        <input type="text" id="invName" placeholder="ឈ្មោះផលិតផល">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>តម្លៃទិញ ($)</label>
+          <input type="number" id="invCost" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>តម្លៃលក់ ($)</label>
+          <input type="number" id="invPrice" placeholder="0.00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ចំនួន</label>
+        <input type="number" id="invQty" placeholder="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('inventoryModal')">បោះបង់</button>
+      <button class="btn-primary" onclick="saveInventory()">រក្សាទុក</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>បន្ថែមអតិថិជន</h2>
+      <button class="modal-close" onclick="closeModal('customerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="custId">
+      <div class="form-group">
+        <label>ឈ្មោះ</label>
+        <input type="text" id="custName" placeholder="ឈ្មោះអតិថិជន">
+      </div>
+      <div class="form-group">
+        <label>លេខទូរស័ព្ទ</label>
+        <input type="tel" id="custPhone" placeholder="0xx xxx xxx">
+      </div>
+      <div class="form-group">
+        <label>អាសយដ្ឋាន</label>
+        <input type="text" id="custAddress" placeholder="អាសយដ្ឋាន (ស្រេចចិត្ត)">
+      </div>
+      <!-- Profile Upload Section -->
+<div class="profile-upload">
+<div class="profile-preview" id="custProfilePreview">👤</div>
+  <div>
+    <input type="file" id="custProfileInput" accept="image/*" style="display:none" onchange="handleProfileUpload(event)">
+    <button type="button" class="upload-btn" onclick="document.getElementById('custProfileInput').click()">📷 ជ្រើសរើសរូប</button>
+    <button type="button" class="upload-btn" onclick="document.getElementById('custProfilePreview').innerHTML='<span>👤</span>'; document.getElementById('custProfilePreview').style.background='linear-gradient(135deg, var(--primary), var(--primary-light))'; currentProfileFile=null; document.getElementById('custProfileInput').value=''">🗑️ លុបរូប</button>
+  </div>
+</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('customerModal')">បោះបង់</button>
+      <button class="btn-primary" onclick="saveCustomer()">រក្សាទុក</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>បង្កើតការបញ្ជាទិញ</h2>
+      <button class="modal-close" onclick="closeModal('orderModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>ជ្រើសរើសអតិថិជន</label>
+          <select id="orderCustomer">
+            <option value="">-- ជ្រើសរើស --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>កាលបរិច្ឆេទ</label>
+          <input type="date" id="orderDate">
+        </div>
+      </div>
+
+      <div class="order-items-header">
+        <h4>ផលិតផល</h4>
+        <button class="btn-small" onclick="addOrderItem()">+ បន្ថែម</button>
+      </div>
+      <div id="orderItems"></div>
+
+      <div class="order-summary">
+        <div class="summary-row">
+          <span>សរុបទឹកប្រាក់:</span>
+          <strong id="orderTotal">$0.00</strong>
+        </div>
+        <div class="summary-row">
+          <span>ចំណេញ:</span>
+          <strong id="orderProfit" class="profit-text">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>កំណត់ចំណាំ</label>
+        <textarea id="orderNote" placeholder="កំណត់ចំណាំ" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('orderModal')">បោះបង់</button>
+      <button class="btn-primary" onclick="saveOrder()">រក្សាទុក & បង្កើតវិក្កយបត្រ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Debt Modal -->
+<div class="modal-overlay" id="debtModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>បន្ថែមបំណុល</h2>
+      <button class="modal-close" onclick="closeModal('debtModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="debtId">
+      <div class="form-group">
+        <label>ឈ្មោះ</label>
+        <input type="text" id="debtName" placeholder="ឈ្មោះ">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ប្រភេទ</label>
+          <select id="debtType">
+            <option value="receivable">អតិថិជនជំពាក់ (ត្រូវទទួល)</option>
+            <option value="payable">ខ្ញុំជំពាក់ (ត្រូវបង់)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ចំនួន ($)</label>
+          <input type="number" id="debtAmount" placeholder="0.00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ពិពណ៌នា</label>
+        <input type="text" id="debtDesc" placeholder="ហេតុផល">
+      </div>
+      <div class="form-group">
+        <label>កាលបរិច្ឆេទ</label>
+        <input type="date" id="debtDate">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('debtModal')">បោះបង់</button>
+      <button class="btn-primary" onclick="saveDebt()">រក្សាទុក</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>វិក្កយបត្រ</h2>
+      <button class="modal-close" onclick="closeModal('invoiceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="invoice-actions">
+        <button class="btn-secondary" onclick="printInvoice()">🖨️ បោះពុម្ព</button>
+        <button class="btn-primary" onclick="downloadInvoiceImage()">📥 ទាញយករូបភាព</button>
+      </div>
+      <div id="invoiceContent" class="invoice-wrapper">
+        <!-- Invoice filled by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Customer History Modal -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="historyTitle">ប្រវត្តិការទិញ</h2>
+      <button class="modal-close" onclick="closeModal('historyModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="historyContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script src="./script.js"></script>
+
+</body>
+</html>
