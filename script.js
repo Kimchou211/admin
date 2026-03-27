@@ -6,6 +6,11 @@
 // កំណត់ផ្លូវទៅកាន់រូបភាព QR Code របស់អ្នក (ដាក់រូបភាពក្នុង folder គម្រោងរបស់អ្នក)
 const PAYMENT_QR_PATH = 'assets/my-qr.jpg'; 
 
+// Supabase Configuration
+const SUPABASE_URL = 'https://ovkokplnskgljyvmeuib.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ddoicC8xr_JlfhwRsFqSdQ_xhmIhTWZ';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let customers = [];
 let products  = [];
 let transactions = [];
