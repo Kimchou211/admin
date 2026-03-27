@@ -5,13 +5,17 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 // ១. ភ្ជាប់ទៅកាន់ Database
-$host = "localhost";
-$db_name = "nyka_shopp_db";
-$username = "root";
-$password = ""; // ទុកទទេបើប្រើ XAMPP ធម្មតា
+
+// ព័ត៌មានភ្ជាប់ទៅកាន់ Supabase (ផ្អែកលើ Project URL: ovkokplnskgljyvmeuib)
+$host     = getenv('DB_HOST') ?: 'db.ovkokplnskgljyvmeuib.supabase.co';
+$db_name  = getenv('DB_NAME') ?: 'postgres';
+$username = getenv('DB_USER');     // ជាទូទៅគឺ postgres
+$password = getenv('DB_PASSWORD'); // លេខសម្ងាត់ Database របស់អ្នក
+$port     = getenv('DB_PORT') ?: '5432';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
+    // ប្រើ pgsql driver តែមួយគត់សម្រាប់ Supabase
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db_name", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     echo json_encode(["error" => "ការភ្ជាប់បរាជ័យ: " . $e->getMessage()]);
